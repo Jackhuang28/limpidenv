@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA | Modern Minimalist Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. CSS 變數與基礎設定 --- */
+        :root {
+            --bg-color: #Fdfdfc; /* 溫暖的米白色 */
+            --text-main: #1a1a1a; /* 深炭黑 */
+            --text-secondary: #666666; /* 柔和灰 */
+            --accent-color: #8c8881; /* 高級灰褐 */
+            --btn-hover: #333333;
+            --border-light: #e5e5e5;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Inter', sans-serif;
+            --transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { width: 100%; display: block; }
+
+        /* --- 2. 導航欄 (Sticky Nav) --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: var(--transition);
+            background: transparent;
+        }
+
+        header.scrolled {
+            background: rgba(253, 253, 252, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.03);
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--text-main);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        nav a {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            font-weight: 400;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--text-main);
+            transition: var(--transition);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: var(--text-main);
+            color: #fff;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0; /* 預設隱藏，有商品時顯示 */
+            transition: var(--transition);
+        }
+
+        .cart-count.active {
+            opacity: 1;
+        }
+
+        /* --- 3. Hero Section (首屏) --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            filter: grayscale(20%) brightness(0.9);
+            z-index: -1;
+            transition: transform 10s ease;
+        }
+        
+        /* 簡單的視差滾動效果 */
+        .hero:hover .hero-bg {
+            transform: scale(1.05);
+        }
+
+        .hero-content {
+            text-align: center;
+            color: #fff;
+            max-width: 600px;
+            padding: 0 20px;
+            animation: fadeUp 1s ease-out;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: 4rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: #fff;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            border: 1px solid #fff;
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: #fff;
+        }
+
+        /* --- 4. 產品區塊 (Featured) --- */
+        .section {
+            padding: 6rem 5%;
+        }
+
+        .section-header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        .section-header h2 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 3rem 2rem;
+        }
+
+        .product-card {
+            group: relative;
+            cursor: pointer;
+        }
+
+        .product-image {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 3/4;
+            background: #f0f0f0;
+            margin-bottom: 1rem;
+        }
+
+        .product-image img {
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.03);
+        }
+
+        /* 懸浮出現的按鈕 */
+        .add-to-cart-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.9);
+            padding: 1rem;
+            text-align: center;
+            transform: translateY(100%);
+            transition: var(--transition);
+        }
+
+        .product-card:hover .add-to-cart-overlay {
+            transform: translateY(0);
+        }
+
+        .add-btn {
+            background: none;
+            border: none;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .product-info h3 {
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 0.3rem;
+        }
+
+        .product-info .price {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-family: var(--font-serif);
+        }
+
+        /* --- 5. Footer --- */
+        footer {
+            background-color: #f5f5f4;
+            padding: 4rem 5%;
+            margin-top: 4rem;
+            text-align: center;
+            border-top: 1px solid var(--border-light);
+        }
+
+        footer p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+        }
+
+        /* --- 6. Toast 通知 (加入購物車成功) --- */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--text-main);
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 2px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+            z-index: 2000;
+            pointer-events: none;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- 動畫 Keyframes --- */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RWD */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.8rem; }
+            nav ul { display: none; } /* 手機版簡化：隱藏選單 */
+            .logo { flex-grow: 1; text-align: center; }
+            .cart-icon { position: absolute; right: 5%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="navbar">
+        <nav>
+            <ul>
+                <li><a href="#">Shop</a></li>
+                <li><a href="#">Collections</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </nav>
+        
+        <div class="logo">AURA</div>
+
+        <div class="cart-icon" onclick="toggleCart()">
+            CART 
+            <span class="cart-count" id="cartCount">0</span>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1>Elevate Your Space</h1>
+            <p>Curated minimalist essentials for modern living.</p>
+            <a href="#featured" class="btn">Explore Collection</a>
+        </div>
+    </section>
+
+    <section id="featured" class="section">
+        <div class="section-header">
+            <h2>New Arrivals</h2>
+            <p>Timeless design, sustainable materials.</p>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1544457070-4cd773b4d71e?q=80&w=1000&auto=format&fit=crop" alt="Chair">
+                    <div class="add-to-cart-overlay">
+                        <button class="add-btn" onclick="addToCart('Lounge Chair')">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3>Lounge Chair 01</h3>
+                    <span class="price">$320.00</span>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1523755231516-e43fd2e8dca5?q=80&w=1000&auto=format&fit=crop" alt="Lamp">
+                    <div class="add-to-cart-overlay">
+                        <button class="add-btn" onclick="addToCart('Ceramic Lamp')">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3>Ceramic Table Lamp</h3>
+                    <span class="price">$150.00</span>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1579586337278-3befd40fd17a?q=80&w=1000&auto=format&fit=crop" alt="Vase">
+                    <div class="add-to-cart-overlay">
+                        <button class="add-btn" onclick="addToCart('Minimalist Vase')">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3>Minimalist Vase</h3>
+                    <span class="price">$85.00</span>
+                </div>
+            </div>
+
+             <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1595515106967-1b3eb3d69c6d?q=80&w=1000&auto=format&fit=crop" alt="Clock">
+                    <div class="add-to-cart-overlay">
+                        <button class="add-btn" onclick="addToCart('Analog Clock')">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3>Analog Wall Clock</h3>
+                    <span class="price">$120.00</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="logo" style="font-size: 1.5rem;">AURA</div>
+        <p>&copy; 2023 AURA Studio. All rights reserved.</p>
+    </footer>
+
+    <div id="toast">Item added to cart</div>
+
+    <script>
+        // --- 1. 導航欄滾動效果 ---
+        const navbar = document.getElementById('navbar');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // --- 2. 購物車邏輯 ---
+        let count = 0;
+        const cartCountEl = document.getElementById('cartCount');
+        const toast = document.getElementById('toast');
+
+        function addToCart(productName) {
+            // 更新計數
+            count++;
+            cartCountEl.innerText = count;
+            cartCountEl.classList.add('active');
+
+            // 顯示 Toast 通知
+            showToast(`${productName} added to cart`);
+        }
+
+        function showToast(message) {
+            toast.innerText = message;
+            toast.classList.add('show');
+            
+            // 3秒後消失
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- 3. 簡單的載入動畫 (Staggered Fade In) ---
+        // 當頁面滾動到產品區塊時，讓產品卡片依序浮現 (使用 Intersection Observer)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        const cards = document.querySelectorAll('.product-card');
+        cards.forEach((card, index) => {
+            // 初始狀態
+            card.style.opacity = 0;
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `all 0.6s ease-out ${index * 0.1}s`; // 延遲效果
+            observer.observe(card);
+        });
+
+    </script>
+</body>
+</html>
